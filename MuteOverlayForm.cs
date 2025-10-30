@@ -13,7 +13,6 @@ namespace MicMute
         private readonly string registryOverlayBgColor = "OverlayBgColor";
         private readonly string registryOverlayMutedTextColor = "OverlayMutedTextColor";
         private readonly string registryOverlayUnmutedTextColor = "OverlayUnmutedTextColor";
-        private Timer autoHideTimer;
         private Timer previewTimer;
         private Label statusLabel;
         private PictureBox iconBox;
@@ -70,11 +69,6 @@ namespace MicMute
             };
             this.Controls.Add(statusLabel);
 
-            // 自动隐藏计时器
-            autoHideTimer = new Timer();
-            autoHideTimer.Interval = 3000; // 3秒
-            autoHideTimer.Tick += AutoHideTimer_Tick;
-            
             // 预览自动隐藏计时器
             previewTimer = new Timer();
             previewTimer.Interval = 5000; // 5秒
@@ -186,7 +180,6 @@ namespace MicMute
 
         public void ShowMuted()
         {
-            autoHideTimer.Stop();
             previewTimer.Stop();
             statusLabel.Text = "麦克风已静音";
             statusLabel.ForeColor = mutedTextColor;
@@ -209,28 +202,13 @@ namespace MicMute
 
         public void ShowUnmuted()
         {
+            // 非静音时直接隐藏悬浮窗，不显示任何内容
             previewTimer.Stop();
-            statusLabel.Text = "麦克风已开启";
-            statusLabel.ForeColor = unmutedTextColor;
-            
-            // 使用托盘图标（绿色）
-            try
-            {
-                iconBox.Image = Properties.Resources.on.ToBitmap();
-            }
-            catch
-            {
-                // 如果图标资源不存在，使用默认图标
-            }
-
-            this.Show();
-            autoHideTimer.Stop();
-            autoHideTimer.Start();
+            this.Hide();
         }
 
         public void ShowPreview()
         {
-            autoHideTimer.Stop();
             statusLabel.Text = "悬浮窗预览";
             statusLabel.ForeColor = Color.FromArgb(100, 150, 200);
             
@@ -250,14 +228,7 @@ namespace MicMute
         
         public void HideOverlay()
         {
-            autoHideTimer.Stop();
             previewTimer.Stop();
-            this.Hide();
-        }
-
-        private void AutoHideTimer_Tick(object sender, EventArgs e)
-        {
-            autoHideTimer.Stop();
             this.Hide();
         }
         
