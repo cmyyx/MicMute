@@ -58,6 +58,8 @@
             this.overlayPreviewButton = new System.Windows.Forms.Button();
             this.overlaySaveButton = new System.Windows.Forms.Button();
             this.overlayHideButton = new System.Windows.Forms.Button();
+            this.overlayBottomCenterButton = new System.Windows.Forms.Button();
+            this.overlayTopCenterButton = new System.Windows.Forms.Button();
             this.iconContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -344,7 +346,7 @@
             // overlayHideButton
             // 
             this.overlayHideButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.overlayHideButton.Location = new System.Drawing.Point(400, 427);
+            this.overlayHideButton.Location = new System.Drawing.Point(554, 427);
             this.overlayHideButton.Margin = new System.Windows.Forms.Padding(6);
             this.overlayHideButton.Name = "overlayHideButton";
             this.overlayHideButton.Size = new System.Drawing.Size(130, 45);
@@ -353,11 +355,37 @@
             this.overlayHideButton.UseVisualStyleBackColor = true;
             this.overlayHideButton.Click += new System.EventHandler(this.OverlayHideButton_Click);
             // 
+            // overlayBottomCenterButton
+            // 
+            this.overlayBottomCenterButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.overlayBottomCenterButton.Location = new System.Drawing.Point(400, 427);
+            this.overlayBottomCenterButton.Margin = new System.Windows.Forms.Padding(6);
+            this.overlayBottomCenterButton.Name = "overlayBottomCenterButton";
+            this.overlayBottomCenterButton.Size = new System.Drawing.Size(70, 45);
+            this.overlayBottomCenterButton.TabIndex = 26;
+            this.overlayBottomCenterButton.Text = "底部";
+            this.overlayBottomCenterButton.UseVisualStyleBackColor = true;
+            this.overlayBottomCenterButton.Click += new System.EventHandler(this.OverlayBottomCenterButton_Click);
+            // 
+            // overlayTopCenterButton
+            // 
+            this.overlayTopCenterButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.overlayTopCenterButton.Location = new System.Drawing.Point(480, 427);
+            this.overlayTopCenterButton.Margin = new System.Windows.Forms.Padding(6);
+            this.overlayTopCenterButton.Name = "overlayTopCenterButton";
+            this.overlayTopCenterButton.Size = new System.Drawing.Size(70, 45);
+            this.overlayTopCenterButton.TabIndex = 27;
+            this.overlayTopCenterButton.Text = "顶部";
+            this.overlayTopCenterButton.UseVisualStyleBackColor = true;
+            this.overlayTopCenterButton.Click += new System.EventHandler(this.OverlayTopCenterButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(699, 690);
+            this.Controls.Add(this.overlayTopCenterButton);
+            this.Controls.Add(this.overlayBottomCenterButton);
             this.Controls.Add(this.overlayHideButton);
             this.Controls.Add(this.overlayUnmutedColorTextBox);
             this.Controls.Add(this.overlayMutedColorTextBox);
@@ -423,6 +451,8 @@
         private System.Windows.Forms.Button overlayPreviewButton;
         private System.Windows.Forms.Button overlaySaveButton;
         private System.Windows.Forms.Button overlayHideButton;
+        private System.Windows.Forms.Button overlayBottomCenterButton;
+        private System.Windows.Forms.Button overlayTopCenterButton;
     }
 }
 

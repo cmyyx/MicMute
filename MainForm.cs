@@ -325,6 +325,40 @@ namespace MicMute
         {
             muteOverlayForm.HideOverlay();
         }
+        
+        private void OverlayBottomCenterButton_Click(object sender, EventArgs e)
+        {
+            // 计算底部居中位置
+            int screenWidth = Screen.PrimaryScreen.WorkingArea.Width;
+            int screenHeight = Screen.PrimaryScreen.WorkingArea.Height;
+            int overlayWidth = 250; // 悬浮窗宽度
+            int overlayHeight = 80; // 悬浮窗高度
+            
+            int x = (screenWidth - overlayWidth) / 2;
+            int y = screenHeight - overlayHeight - 50; // 距离底部50像素
+            
+            overlayXTextBox.Text = x.ToString();
+            overlayYTextBox.Text = y.ToString();
+            
+            // 自动预览
+            OverlayPreviewButton_Click(sender, e);
+        }
+        
+        private void OverlayTopCenterButton_Click(object sender, EventArgs e)
+        {
+            // 计算顶部居中位置
+            int screenWidth = Screen.PrimaryScreen.WorkingArea.Width;
+            int overlayWidth = 250; // 悬浮窗宽度
+            
+            int x = (screenWidth - overlayWidth) / 2;
+            int y = 20; // 距离顶部20像素
+            
+            overlayXTextBox.Text = x.ToString();
+            overlayYTextBox.Text = y.ToString();
+            
+            // 自动预览
+            OverlayPreviewButton_Click(sender, e);
+        }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
