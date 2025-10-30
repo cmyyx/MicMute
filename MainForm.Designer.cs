@@ -44,6 +44,13 @@
             this.label3 = new System.Windows.Forms.Label();
             this.unmuteReset = new System.Windows.Forms.Button();
             this.unmuteTextBox = new Shortcut.Forms.HotkeyTextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.overlayXTextBox = new System.Windows.Forms.TextBox();
+            this.overlayYTextBox = new System.Windows.Forms.TextBox();
+            this.labelX = new System.Windows.Forms.Label();
+            this.labelY = new System.Windows.Forms.Label();
+            this.overlayPreviewButton = new System.Windows.Forms.Button();
+            this.overlaySaveButton = new System.Windows.Forms.Button();
             this.iconContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -187,11 +194,95 @@
             this.unmuteTextBox.TabIndex = 8;
             this.unmuteTextBox.Text = "None";
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label4.Location = new System.Drawing.Point(26, 386);
+            this.label4.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(389, 37);
+            this.label4.TabIndex = 10;
+            this.label4.Text = "悬浮窗位置 (屏幕坐标)";
+            // 
+            // labelX
+            // 
+            this.labelX.AutoSize = true;
+            this.labelX.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelX.Location = new System.Drawing.Point(26, 439);
+            this.labelX.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelX.Name = "labelX";
+            this.labelX.Size = new System.Drawing.Size(48, 37);
+            this.labelX.TabIndex = 11;
+            this.labelX.Text = "X:";
+            // 
+            // overlayXTextBox
+            // 
+            this.overlayXTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.overlayXTextBox.Location = new System.Drawing.Point(86, 436);
+            this.overlayXTextBox.Margin = new System.Windows.Forms.Padding(6);
+            this.overlayXTextBox.Name = "overlayXTextBox";
+            this.overlayXTextBox.Size = new System.Drawing.Size(120, 44);
+            this.overlayXTextBox.TabIndex = 12;
+            this.overlayXTextBox.Text = "0";
+            // 
+            // labelY
+            // 
+            this.labelY.AutoSize = true;
+            this.labelY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelY.Location = new System.Drawing.Point(230, 439);
+            this.labelY.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelY.Name = "labelY";
+            this.labelY.Size = new System.Drawing.Size(47, 37);
+            this.labelY.TabIndex = 13;
+            this.labelY.Text = "Y:";
+            // 
+            // overlayYTextBox
+            // 
+            this.overlayYTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.overlayYTextBox.Location = new System.Drawing.Point(287, 436);
+            this.overlayYTextBox.Margin = new System.Windows.Forms.Padding(6);
+            this.overlayYTextBox.Name = "overlayYTextBox";
+            this.overlayYTextBox.Size = new System.Drawing.Size(120, 44);
+            this.overlayYTextBox.TabIndex = 14;
+            this.overlayYTextBox.Text = "0";
+            // 
+            // overlayPreviewButton
+            // 
+            this.overlayPreviewButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.overlayPreviewButton.Location = new System.Drawing.Point(430, 433);
+            this.overlayPreviewButton.Margin = new System.Windows.Forms.Padding(6);
+            this.overlayPreviewButton.Name = "overlayPreviewButton";
+            this.overlayPreviewButton.Size = new System.Drawing.Size(120, 50);
+            this.overlayPreviewButton.TabIndex = 15;
+            this.overlayPreviewButton.Text = "预览";
+            this.overlayPreviewButton.UseVisualStyleBackColor = true;
+            this.overlayPreviewButton.Click += new System.EventHandler(this.OverlayPreviewButton_Click);
+            // 
+            // overlaySaveButton
+            // 
+            this.overlaySaveButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.overlaySaveButton.Location = new System.Drawing.Point(564, 433);
+            this.overlaySaveButton.Margin = new System.Windows.Forms.Padding(6);
+            this.overlaySaveButton.Name = "overlaySaveButton";
+            this.overlaySaveButton.Size = new System.Drawing.Size(120, 50);
+            this.overlaySaveButton.TabIndex = 16;
+            this.overlaySaveButton.Text = "保存";
+            this.overlaySaveButton.UseVisualStyleBackColor = true;
+            this.overlaySaveButton.Click += new System.EventHandler(this.OverlaySaveButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(699, 377);
+            this.ClientSize = new System.Drawing.Size(699, 510);
+            this.Controls.Add(this.overlaySaveButton);
+            this.Controls.Add(this.overlayPreviewButton);
+            this.Controls.Add(this.overlayYTextBox);
+            this.Controls.Add(this.labelY);
+            this.Controls.Add(this.overlayXTextBox);
+            this.Controls.Add(this.labelX);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.unmuteReset);
             this.Controls.Add(this.unmuteTextBox);
             this.Controls.Add(this.label3);
@@ -229,6 +320,13 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button unmuteReset;
         private Shortcut.Forms.HotkeyTextBox unmuteTextBox;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox overlayXTextBox;
+        private System.Windows.Forms.TextBox overlayYTextBox;
+        private System.Windows.Forms.Label labelX;
+        private System.Windows.Forms.Label labelY;
+        private System.Windows.Forms.Button overlayPreviewButton;
+        private System.Windows.Forms.Button overlaySaveButton;
     }
 }
 

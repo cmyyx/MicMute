@@ -111,6 +111,12 @@
     <Compile Include="MicSelectorForm.Designer.cs">
       <DependentUpon>MicSelectorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MuteOverlayForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MuteOverlayForm.Designer.cs">
+      <DependentUpon>MuteOverlayForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
@@ -118,6 +124,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MicSelectorForm.resx">
       <DependentUpon>MicSelectorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MuteOverlayForm.resx">
+      <DependentUpon>MuteOverlayForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

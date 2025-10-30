@@ -33,10 +33,13 @@ namespace MicMute
 
         private readonly string registryDeviceId = "DeviceId";
         private readonly string registryDeviceName = "DeviceName";
+        private readonly string registryOverlayX = "OverlayX";
+        private readonly string registryOverlayY = "OverlayY";
 
         private string selectedDeviceId;
         private string selectedDeviceName;
         private MicSelectorForm micSelectorForm;
+        private MuteOverlayForm muteOverlayForm;
 
 
         enum MicStatus
@@ -55,6 +58,7 @@ namespace MicMute
         public MainForm()
         {
             InitializeComponent();
+            muteOverlayForm = new MuteOverlayForm();
         }
 
         private void OnNextDevice(DeviceChangedArgs next)
@@ -164,10 +168,12 @@ namespace MicMute
                 case MicStatus.On:
                     UpdateIcon(iconOn, device.FullName);
                     if (playSound) PlaySound("on.wav");
+                    if (playSound) muteOverlayForm.ShowUnmuted();
                     break;
                 case MicStatus.Off:
                     UpdateIcon(iconOff, device.FullName);
                     if (playSound) PlaySound("off.wav");
+                    muteOverlayForm.ShowMuted();
                     break;
                 case MicStatus.Error:
                     UpdateIcon(iconError, "< No device >");
@@ -227,7 +233,60 @@ namespace MicMute
                 if (hotkeyBinder.IsHotkeyAlreadyBound(unMuteHotkey)) hotkeyBinder.Unbind(unMuteHotkey);
             }
 
+            // 加载悬浮窗位置
+            LoadOverlayPosition();
+
             MyShow();
+        }
+
+        private void LoadOverlayPosition()
+        {
+            var x = registryKey.GetValue(registryOverlayX);
+            var y = registryKey.GetValue(registryOverlayY);
+
+            if (x != null && y != null)
+            {
+                overlayXTextBox.Text = x.ToString();
+                overlayYTextBox.Text = y.ToString();
+            }
+            else
+            {
+                // 默认位置：屏幕右上角
+                int defaultX = Screen.PrimaryScreen.WorkingArea.Width - 270;
+                int defaultY = 20;
+                overlayXTextBox.Text = defaultX.ToString();
+                overlayYTextBox.Text = defaultY.ToString();
+            }
+        }
+
+        private void OverlayPreviewButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int x = int.Parse(overlayXTextBox.Text);
+                int y = int.Parse(overlayYTextBox.Text);
+                muteOverlayForm.Location = new Point(x, y);
+                muteOverlayForm.ShowPreview();
+            }
+            catch
+            {
+                MessageBox.Show("请输入有效的坐标数值", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void OverlaySaveButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int x = int.Parse(overlayXTextBox.Text);
+                int y = int.Parse(overlayYTextBox.Text);
+                muteOverlayForm.SavePosition(new Point(x, y));
+                MessageBox.Show("悬浮窗位置已保存", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch
+            {
+                MessageBox.Show("请输入有效的坐标数值", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

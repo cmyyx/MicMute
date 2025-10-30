@@ -1,0 +1,164 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'  # 当推送 v1.0.0 这样的标签时触发
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号 (例如: 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 🔧 设置 MSBuild
+      uses: microsoft/setup-msbuild@v1.3
+      
+    - name: 🔧 设置 NuGet
+      uses: NuGet/setup-nuget@v1
+      
+    - name: 📦 还原 NuGet 包
+      run: nuget restore MicMute.sln
+      
+    - name: 🏗️ 构建 Release 版本
+      run: msbuild MicMute.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=bin\Release\ /v:detailed
+      
+    - name: 📋 验证构建输出
+      run: |
+        echo "=== 构建输出文件 ==="
+        dir bin\Release
+        echo ""
+        if exist "bin\Release\MicMute.exe" (
+          echo ✓ MicMute.exe 构建成功
+        ) else (
+          echo ✗ MicMute.exe 未找到
+          exit 1
+        )
+      shell: cmd
+      
+    - name: 📦 准备发布文件
+      run: |
+        mkdir release-package
+        copy bin\Release\MicMute.exe release-package\
+        copy bin\Release\*.config release-package\ 2>nul || echo "No config files"
+        
+        REM 创建 README
+        echo MicMute - 麦克风静音提醒工具 > release-package\README.txt
+        echo. >> release-package\README.txt
+        echo 使用说明： >> release-package\README.txt
+        echo 1. 双击运行 MicMute.exe >> release-package\README.txt
+        echo 2. 程序会最小化到系统托盘 >> release-package\README.txt
+        echo 3. 右键托盘图标进行设置 >> release-package\README.txt
+        echo. >> release-package\README.txt
+        echo 功能特性： >> release-package\README.txt
+        echo - 麦克风静音/取消静音快捷键 >> release-package\README.txt
+        echo - 静音时显示悬浮窗提醒 >> release-package\README.txt
+        echo - 可自定义悬浮窗位置 >> release-package\README.txt
+        echo - 支持选择特定麦克风设备 >> release-package\README.txt
+        
+        echo 构建完成！
+        dir release-package
+      shell: cmd
+      
+    - name: 📦 创建 ZIP 压缩包
+      run: |
+        Compress-Archive -Path release-package\* -DestinationPath MicMute-Release.zip
+        echo "压缩包创建成功"
+        Get-Item MicMute-Release.zip | Format-List
+      shell: pwsh
+      
+    - name: 📤 上传构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: MicMute-Release-Package
+        path: release-package/
+        retention-days: 90
+        
+    - name: 📤 上传 ZIP 压缩包
+      uses: actions/upload-artifact@v4
+      with:
+        name: MicMute-Release-ZIP
+        path: MicMute-Release.zip
+        retention-days: 90
+        
+    - name: 🎉 创建 GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          MicMute-Release.zip
+          release-package/MicMute.exe
+        body: |
+          ## 🎉 MicMute 发布版本
+          
+          ### 📥 下载
+          - **完整包**: MicMute-Release.zip（推荐）
+          - **单文件**: MicMute.exe
+          
+          ### ✨ 功能特性
+          - ✅ 麦克风静音/取消静音快捷键
+          - ✅ 静音时显示悬浮窗提醒
+          - ✅ 可自定义悬浮窗位置（不可点击穿透）
+          - ✅ 支持选择特定麦克风设备
+          - ✅ 音频提示音效
+          
+          ### 🚀 使用方法
+          1. 下载 `MicMute-Release.zip` 并解压
+          2. 双击运行 `MicMute.exe`
+          3. 程序会最小化到系统托盘（任务栏右下角）
+          4. 右键点击托盘图标进行设置
+          
+          ### 📋 系统要求
+          - Windows 7 或更高版本
+          - .NET Framework 4.5.2 或更高（Windows 10/11 已预装）
+          
+          ### 🔧 设置说明
+          - **选择麦克风**: 右键托盘图标 → Select mic
+          - **设置快捷键**: 右键托盘图标 → Hotkey
+          - **悬浮窗位置**: 在 Hotkey 设置中调整坐标并预览
+          
+          ---
+          
+          构建时间: ${{ github.event.head_commit.timestamp }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: 📊 构建摘要
+      run: |
+        echo "## 🎉 Release 构建成功！" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📦 构建产物" >> $GITHUB_STEP_SUMMARY
+        echo "- **完整包**: MicMute-Release-Package" >> $GITHUB_STEP_SUMMARY
+        echo "- **ZIP 压缩包**: MicMute-Release-ZIP" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if (Test-Path "bin\Release\MicMute.exe") {
+          $fileInfo = Get-Item "bin\Release\MicMute.exe"
+          echo "### ℹ️ 文件信息" >> $GITHUB_STEP_SUMMARY
+          echo "- **文件大小**: $([math]::Round($fileInfo.Length / 1MB, 2)) MB" >> $GITHUB_STEP_SUMMARY
+          echo "- **文件路径**: bin\Release\MicMute.exe" >> $GITHUB_STEP_SUMMARY
+          echo "- **构建时间**: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" >> $GITHUB_STEP_SUMMARY
+        }
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📥 下载方式" >> $GITHUB_STEP_SUMMARY
+        echo "1. 点击上方 'Summary' 标签" >> $GITHUB_STEP_SUMMARY
+        echo "2. 在 'Artifacts' 部分找到构建文件" >> $GITHUB_STEP_SUMMARY
+        echo "3. 点击下载 ZIP 文件" >> $GITHUB_STEP_SUMMARY
+        
+        if ("${{ github.ref }}" -like "refs/tags/*") {
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🏷️ Release 已创建" >> $GITHUB_STEP_SUMMARY
+          echo "前往 [Releases 页面](https://github.com/${{ github.repository }}/releases) 查看和下载" >> $GITHUB_STEP_SUMMARY
+        }
+      shell: pwsh

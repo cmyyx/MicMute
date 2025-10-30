@@ -1,0 +1,93 @@
+name: Build MicMute
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 🔧 设置 MSBuild
+      uses: microsoft/setup-msbuild@v1.3
+      
+    - name: 🔧 设置 NuGet
+      uses: NuGet/setup-nuget@v1
+      
+    - name: 📦 还原 NuGet 包
+      run: nuget restore MicMute.sln
+      
+    - name: 🏗️ 构建 Debug 版本
+      run: msbuild MicMute.sln /p:Configuration=Debug /p:Platform="Any CPU" /v:detailed
+      
+    - name: 🏗️ 构建 Release 版本
+      run: msbuild MicMute.sln /p:Configuration=Release /p:Platform="Any CPU" /v:detailed
+      
+    - name: 📋 列出构建输出
+      run: |
+        echo "=== Debug 输出 ==="
+        dir bin\Debug
+        echo ""
+        echo "=== Release 输出 ==="
+        dir bin\Release
+      shell: cmd
+      
+    - name: 📦 打包 Debug 版本
+      run: |
+        mkdir artifacts\debug
+        copy bin\Debug\MicMute.exe artifacts\debug\
+        copy bin\Debug\*.dll artifacts\debug\ 2>nul || echo "No DLLs to copy"
+        copy bin\Debug\*.config artifacts\debug\ 2>nul || echo "No config files"
+      shell: cmd
+      continue-on-error: true
+      
+    - name: 📦 打包 Release 版本
+      run: |
+        mkdir artifacts\release
+        copy bin\Release\MicMute.exe artifacts\release\
+        copy bin\Release\*.dll artifacts\release\ 2>nul || echo "No DLLs to copy"
+        copy bin\Release\*.config artifacts\release\ 2>nul || echo "No config files"
+      shell: cmd
+      continue-on-error: true
+      
+    - name: 📤 上传 Debug 构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: MicMute-Debug
+        path: artifacts/debug/
+        retention-days: 30
+        
+    - name: 📤 上传 Release 构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: MicMute-Release
+        path: artifacts/release/
+        retention-days: 90
+        
+    - name: 📊 构建摘要
+      run: |
+        echo "## 🎉 构建成功！" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📦 构建产物" >> $GITHUB_STEP_SUMMARY
+        echo "- **Debug 版本**: MicMute-Debug" >> $GITHUB_STEP_SUMMARY
+        echo "- **Release 版本**: MicMute-Release" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📥 下载方式" >> $GITHUB_STEP_SUMMARY
+        echo "1. 点击上方 'Summary' 标签" >> $GITHUB_STEP_SUMMARY
+        echo "2. 在 'Artifacts' 部分找到构建文件" >> $GITHUB_STEP_SUMMARY
+        echo "3. 点击下载" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### ℹ️ 文件信息" >> $GITHUB_STEP_SUMMARY
+        if (Test-Path "bin\Release\MicMute.exe") {
+          $fileInfo = Get-Item "bin\Release\MicMute.exe"
+          echo "- **文件大小**: $([math]::Round($fileInfo.Length / 1MB, 2)) MB" >> $GITHUB_STEP_SUMMARY
+          echo "- **构建时间**: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" >> $GITHUB_STEP_SUMMARY
+        }
+      shell: pwsh
