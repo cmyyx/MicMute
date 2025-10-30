@@ -44,10 +44,6 @@ namespace MicMute
             this.Size = new Size(250, 80);
             this.Opacity = 0.9;
 
-            // 设置窗口样式为透明穿透（不可点击）
-            int initialStyle = GetWindowLong(this.Handle, -20);
-            SetWindowLong(this.Handle, -20, initialStyle | 0x80000 | 0x20);
-
             // 图标
             iconBox = new PictureBox
             {
@@ -224,8 +220,15 @@ namespace MicMute
             }
 
             this.Show();
-            autoHideTimer.Stop();
-            autoHideTimer.Start();
+            
+            // 确保计时器正确启动
+            if (autoHideTimer != null)
+            {
+                autoHideTimer.Stop();
+                autoHideTimer.Enabled = false;
+                autoHideTimer.Enabled = true;
+                autoHideTimer.Start();
+            }
         }
 
         public void ShowPreview()
