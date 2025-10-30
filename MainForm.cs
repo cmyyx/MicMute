@@ -74,6 +74,9 @@ namespace MicMute
 
         private void MyHide()
         {
+            // 先隐藏窗口，避免闪现
+            this.Opacity = 0;
+            this.WindowState = FormWindowState.Minimized;
             ShowInTaskbar = false;
             Location = new Point(-10000, -10000);
             MyVisible = false;
@@ -83,8 +86,8 @@ namespace MicMute
         {
             MyVisible = true;
             ShowInTaskbar = true;
-            this.Opacity = 1;
             this.WindowState = FormWindowState.Normal;
+            this.Opacity = 1;
             CenterToScreen();
         }
 
@@ -182,7 +185,7 @@ namespace MicMute
                 case MicStatus.Off:
                     UpdateIcon(iconOff, device.FullName);
                     if (playSound) PlaySound("off.wav");
-                    muteOverlayForm.ShowMuted();
+                    if (playSound) muteOverlayForm.ShowMuted();
                     break;
                 case MicStatus.Error:
                     UpdateIcon(iconError, "< No device >");
