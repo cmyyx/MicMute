@@ -58,6 +58,12 @@ namespace MicMute
         public MainForm()
         {
             InitializeComponent();
+            
+            // 启动时立即隐藏主窗口
+            this.WindowState = FormWindowState.Minimized;
+            this.ShowInTaskbar = false;
+            this.Opacity = 0;
+            
             muteOverlayForm = new MuteOverlayForm();
         }
 
@@ -77,11 +83,14 @@ namespace MicMute
         {
             MyVisible = true;
             ShowInTaskbar = true;
+            this.Opacity = 1;
+            this.WindowState = FormWindowState.Normal;
             CenterToScreen();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            // 确保窗口完全隐藏
             MyHide();
             selectedDeviceId = (string)registryKey.GetValue(registryDeviceId) ?? "";
             selectedDeviceName = (string)registryKey.GetValue(registryDeviceName) ?? DEFAULT_RECORDING_DEVICE;
@@ -257,6 +266,11 @@ namespace MicMute
                 overlayXTextBox.Text = defaultX.ToString();
                 overlayYTextBox.Text = defaultY.ToString();
             }
+            
+            // 加载颜色设置
+            overlayBgColorTextBox.Text = muteOverlayForm.GetBackgroundColor();
+            overlayMutedColorTextBox.Text = muteOverlayForm.GetMutedTextColor();
+            overlayUnmutedColorTextBox.Text = muteOverlayForm.GetUnmutedTextColor();
         }
 
         private void OverlayPreviewButton_Click(object sender, EventArgs e)
@@ -265,12 +279,20 @@ namespace MicMute
             {
                 int x = int.Parse(overlayXTextBox.Text);
                 int y = int.Parse(overlayYTextBox.Text);
+                
+                // 应用颜色设置（临时）
+                muteOverlayForm.SaveColors(
+                    overlayBgColorTextBox.Text,
+                    overlayMutedColorTextBox.Text,
+                    overlayUnmutedColorTextBox.Text
+                );
+                
                 muteOverlayForm.Location = new Point(x, y);
                 muteOverlayForm.ShowPreview();
             }
             catch
             {
-                MessageBox.Show("请输入有效的坐标数值", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("请输入有效的坐标数值和颜色代码（如 #F0F0F0）", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -280,13 +302,28 @@ namespace MicMute
             {
                 int x = int.Parse(overlayXTextBox.Text);
                 int y = int.Parse(overlayYTextBox.Text);
+                
+                // 保存位置
                 muteOverlayForm.SavePosition(new Point(x, y));
-                MessageBox.Show("悬浮窗位置已保存", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
+                // 保存颜色
+                muteOverlayForm.SaveColors(
+                    overlayBgColorTextBox.Text,
+                    overlayMutedColorTextBox.Text,
+                    overlayUnmutedColorTextBox.Text
+                );
+                
+                MessageBox.Show("悬浮窗设置已保存", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch
             {
-                MessageBox.Show("请输入有效的坐标数值", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("请输入有效的坐标数值和颜色代码（如 #F0F0F0）", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+        
+        private void OverlayHideButton_Click(object sender, EventArgs e)
+        {
+            muteOverlayForm.HideOverlay();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

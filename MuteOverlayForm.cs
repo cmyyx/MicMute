@@ -10,9 +10,18 @@ namespace MicMute
         private readonly RegistryKey registryKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\MicMute");
         private readonly string registryOverlayX = "OverlayX";
         private readonly string registryOverlayY = "OverlayY";
+        private readonly string registryOverlayBgColor = "OverlayBgColor";
+        private readonly string registryOverlayMutedTextColor = "OverlayMutedTextColor";
+        private readonly string registryOverlayUnmutedTextColor = "OverlayUnmutedTextColor";
         private Timer autoHideTimer;
+        private Timer previewTimer;
         private Label statusLabel;
         private PictureBox iconBox;
+        
+        // 默认颜色
+        private Color backgroundColor = Color.FromArgb(240, 240, 240); // #F0F0F0
+        private Color mutedTextColor = Color.FromArgb(255, 69, 0); // 橘红色
+        private Color unmutedTextColor = Color.FromArgb(0, 200, 0); // 绿色
 
         public MuteOverlayForm()
         {
@@ -23,12 +32,15 @@ namespace MicMute
 
         private void InitializeCustomComponents()
         {
+            // 加载自定义颜色
+            LoadColors();
+            
             // 窗体设置 - 不可点击穿透
             this.FormBorderStyle = FormBorderStyle.None;
             this.StartPosition = FormStartPosition.Manual;
             this.TopMost = true;
             this.ShowInTaskbar = false;
-            this.BackColor = Color.FromArgb(40, 40, 40);
+            this.BackColor = backgroundColor;
             this.Size = new Size(250, 80);
             this.Opacity = 0.9;
 
@@ -52,7 +64,7 @@ namespace MicMute
                 Size = new Size(170, 60),
                 Location = new Point(70, 10),
                 Font = new Font("Microsoft YaHei UI", 12F, FontStyle.Bold),
-                ForeColor = Color.White,
+                ForeColor = mutedTextColor,
                 TextAlign = ContentAlignment.MiddleLeft,
                 BackColor = Color.Transparent
             };
@@ -62,6 +74,77 @@ namespace MicMute
             autoHideTimer = new Timer();
             autoHideTimer.Interval = 3000; // 3秒
             autoHideTimer.Tick += AutoHideTimer_Tick;
+            
+            // 预览自动隐藏计时器
+            previewTimer = new Timer();
+            previewTimer.Interval = 5000; // 5秒
+            previewTimer.Tick += PreviewTimer_Tick;
+        }
+        
+        private void LoadColors()
+        {
+            try
+            {
+                // 加载背景颜色
+                var bgColor = registryKey.GetValue(registryOverlayBgColor);
+                if (bgColor != null)
+                {
+                    backgroundColor = ColorTranslator.FromHtml(bgColor.ToString());
+                }
+                
+                // 加载静音文字颜色
+                var mutedColor = registryKey.GetValue(registryOverlayMutedTextColor);
+                if (mutedColor != null)
+                {
+                    mutedTextColor = ColorTranslator.FromHtml(mutedColor.ToString());
+                }
+                
+                // 加载非静音文字颜色
+                var unmutedColor = registryKey.GetValue(registryOverlayUnmutedTextColor);
+                if (unmutedColor != null)
+                {
+                    unmutedTextColor = ColorTranslator.FromHtml(unmutedColor.ToString());
+                }
+            }
+            catch
+            {
+                // 使用默认颜色
+            }
+        }
+        
+        public void SaveColors(string bgColor, string mutedColor, string unmutedColor)
+        {
+            try
+            {
+                backgroundColor = ColorTranslator.FromHtml(bgColor);
+                mutedTextColor = ColorTranslator.FromHtml(mutedColor);
+                unmutedTextColor = ColorTranslator.FromHtml(unmutedColor);
+                
+                registryKey.SetValue(registryOverlayBgColor, bgColor);
+                registryKey.SetValue(registryOverlayMutedTextColor, mutedColor);
+                registryKey.SetValue(registryOverlayUnmutedTextColor, unmutedColor);
+                
+                this.BackColor = backgroundColor;
+            }
+            catch
+            {
+                // 忽略错误
+            }
+        }
+        
+        public string GetBackgroundColor()
+        {
+            return ColorTranslator.ToHtml(backgroundColor);
+        }
+        
+        public string GetMutedTextColor()
+        {
+            return ColorTranslator.ToHtml(mutedTextColor);
+        }
+        
+        public string GetUnmutedTextColor()
+        {
+            return ColorTranslator.ToHtml(unmutedTextColor);
         }
 
         // Windows API 用于设置窗口穿透
@@ -104,12 +187,14 @@ namespace MicMute
         public void ShowMuted()
         {
             autoHideTimer.Stop();
+            previewTimer.Stop();
             statusLabel.Text = "麦克风已静音";
-            statusLabel.ForeColor = Color.FromArgb(255, 100, 100);
+            statusLabel.ForeColor = mutedTextColor;
             
+            // 使用托盘图标（橘红色）
             try
             {
-                iconBox.Image = Properties.Resources.microphone_off;
+                iconBox.Image = Properties.Resources.off.ToBitmap();
             }
             catch
             {
@@ -124,12 +209,14 @@ namespace MicMute
 
         public void ShowUnmuted()
         {
+            previewTimer.Stop();
             statusLabel.Text = "麦克风已开启";
-            statusLabel.ForeColor = Color.FromArgb(100, 255, 100);
+            statusLabel.ForeColor = unmutedTextColor;
             
+            // 使用托盘图标（绿色）
             try
             {
-                iconBox.Image = Properties.Resources.microphone_black_shape;
+                iconBox.Image = Properties.Resources.on.ToBitmap();
             }
             catch
             {
@@ -143,12 +230,13 @@ namespace MicMute
 
         public void ShowPreview()
         {
+            autoHideTimer.Stop();
             statusLabel.Text = "悬浮窗预览";
-            statusLabel.ForeColor = Color.FromArgb(100, 200, 255);
+            statusLabel.ForeColor = Color.FromArgb(100, 150, 200);
             
             try
             {
-                iconBox.Image = Properties.Resources.microphone_black_shape;
+                iconBox.Image = Properties.Resources.on.ToBitmap();
             }
             catch
             {
@@ -156,11 +244,26 @@ namespace MicMute
             }
 
             this.Show();
+            previewTimer.Stop();
+            previewTimer.Start();
+        }
+        
+        public void HideOverlay()
+        {
+            autoHideTimer.Stop();
+            previewTimer.Stop();
+            this.Hide();
         }
 
         private void AutoHideTimer_Tick(object sender, EventArgs e)
         {
             autoHideTimer.Stop();
+            this.Hide();
+        }
+        
+        private void PreviewTimer_Tick(object sender, EventArgs e)
+        {
+            previewTimer.Stop();
             this.Hide();
         }
 
