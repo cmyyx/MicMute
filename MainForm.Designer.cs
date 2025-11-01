@@ -60,6 +60,21 @@
             this.overlayHideButton = new System.Windows.Forms.Button();
             this.overlayBottomCenterButton = new System.Windows.Forms.Button();
             this.overlayTopCenterButton = new System.Windows.Forms.Button();
+            this.webhookGroupBox = new System.Windows.Forms.GroupBox();
+            this.webhookEnabledCheckBox = new System.Windows.Forms.CheckBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.webhookHostTextBox = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.webhookPortTextBox = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.webhookPathTextBox = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.webhookTokenTextBox = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.webhookMutedMessageTextBox = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.webhookUnmutedMessageTextBox = new System.Windows.Forms.TextBox();
+            this.webhookGroupBox.SuspendLayout();
             this.iconContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -379,11 +394,162 @@
             this.overlayTopCenterButton.UseVisualStyleBackColor = true;
             this.overlayTopCenterButton.Click += new System.EventHandler(this.OverlayTopCenterButton_Click);
             // 
+            // 
+            // webhookGroupBox
+            // 
+            this.webhookGroupBox.Controls.Add(this.webhookEnabledCheckBox);
+            this.webhookGroupBox.Controls.Add(this.label10);
+            this.webhookGroupBox.Controls.Add(this.webhookHostTextBox);
+            this.webhookGroupBox.Controls.Add(this.label11);
+            this.webhookGroupBox.Controls.Add(this.webhookPortTextBox);
+            this.webhookGroupBox.Controls.Add(this.label12);
+            this.webhookGroupBox.Controls.Add(this.webhookPathTextBox);
+            this.webhookGroupBox.Controls.Add(this.label13);
+            this.webhookGroupBox.Controls.Add(this.webhookTokenTextBox);
+            this.webhookGroupBox.Controls.Add(this.label14);
+            this.webhookGroupBox.Controls.Add(this.webhookMutedMessageTextBox);
+            this.webhookGroupBox.Controls.Add(this.label15);
+            this.webhookGroupBox.Controls.Add(this.webhookUnmutedMessageTextBox);
+            this.webhookGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.webhookGroupBox.Location = new System.Drawing.Point(26, 690);
+            this.webhookGroupBox.Name = "webhookGroupBox";
+            this.webhookGroupBox.Size = new System.Drawing.Size(658, 380);
+            this.webhookGroupBox.TabIndex = 28;
+            this.webhookGroupBox.TabStop = false;
+            this.webhookGroupBox.Text = "Webhook 设置";
+            // 
+            // webhookEnabledCheckBox
+            // 
+            this.webhookEnabledCheckBox.AutoSize = true;
+            this.webhookEnabledCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.webhookEnabledCheckBox.Location = new System.Drawing.Point(15, 35);
+            this.webhookEnabledCheckBox.Name = "webhookEnabledCheckBox";
+            this.webhookEnabledCheckBox.Size = new System.Drawing.Size(180, 35);
+            this.webhookEnabledCheckBox.TabIndex = 0;
+            this.webhookEnabledCheckBox.Text = "启用 Webhook";
+            this.webhookEnabledCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label10.Location = new System.Drawing.Point(10, 75);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(100, 29);
+            this.label10.TabIndex = 1;
+            this.label10.Text = "主机/IP:";
+            // 
+            // webhookHostTextBox
+            // 
+            this.webhookHostTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.webhookHostTextBox.Location = new System.Drawing.Point(120, 72);
+            this.webhookHostTextBox.Name = "webhookHostTextBox";
+            this.webhookHostTextBox.Size = new System.Drawing.Size(200, 35);
+            this.webhookHostTextBox.TabIndex = 2;
+            this.webhookHostTextBox.Text = "localhost";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label11.Location = new System.Drawing.Point(340, 75);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(70, 29);
+            this.label11.TabIndex = 3;
+            this.label11.Text = "端口:";
+            // 
+            // webhookPortTextBox
+            // 
+            this.webhookPortTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.webhookPortTextBox.Location = new System.Drawing.Point(420, 72);
+            this.webhookPortTextBox.Name = "webhookPortTextBox";
+            this.webhookPortTextBox.Size = new System.Drawing.Size(100, 35);
+            this.webhookPortTextBox.TabIndex = 4;
+            this.webhookPortTextBox.Text = "8765";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label12.Location = new System.Drawing.Point(10, 120);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(70, 29);
+            this.label12.TabIndex = 5;
+            this.label12.Text = "路径:";
+            // 
+            // webhookPathTextBox
+            // 
+            this.webhookPathTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.webhookPathTextBox.Location = new System.Drawing.Point(120, 117);
+            this.webhookPathTextBox.Name = "webhookPathTextBox";
+            this.webhookPathTextBox.Size = new System.Drawing.Size(400, 35);
+            this.webhookPathTextBox.TabIndex = 6;
+            this.webhookPathTextBox.Text = "/webhook";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label13.Location = new System.Drawing.Point(10, 165);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(82, 29);
+            this.label13.TabIndex = 7;
+            this.label13.Text = "Token:";
+            // 
+            // webhookTokenTextBox
+            // 
+            this.webhookTokenTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.webhookTokenTextBox.Location = new System.Drawing.Point(120, 162);
+            this.webhookTokenTextBox.Name = "webhookTokenTextBox";
+            this.webhookTokenTextBox.Size = new System.Drawing.Size(400, 35);
+            this.webhookTokenTextBox.TabIndex = 8;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label14.Location = new System.Drawing.Point(10, 210);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(154, 29);
+            this.label14.TabIndex = 9;
+            this.label14.Text = "静音消息体:";
+            // 
+            // webhookMutedMessageTextBox
+            // 
+            this.webhookMutedMessageTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.webhookMutedMessageTextBox.Location = new System.Drawing.Point(15, 245);
+            this.webhookMutedMessageTextBox.Multiline = true;
+            this.webhookMutedMessageTextBox.Name = "webhookMutedMessageTextBox";
+            this.webhookMutedMessageTextBox.Size = new System.Drawing.Size(620, 50);
+            this.webhookMutedMessageTextBox.TabIndex = 10;
+            this.webhookMutedMessageTextBox.Text = "{\"message\": \"麦克风已静音\"}";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label15.Location = new System.Drawing.Point(10, 305);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(178, 29);
+            this.label15.TabIndex = 11;
+            this.label15.Text = "非静音消息体:";
+            // 
+            // webhookUnmutedMessageTextBox
+            // 
+            this.webhookUnmutedMessageTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.webhookUnmutedMessageTextBox.Location = new System.Drawing.Point(15, 340);
+            this.webhookUnmutedMessageTextBox.Multiline = true;
+            this.webhookUnmutedMessageTextBox.Name = "webhookUnmutedMessageTextBox";
+            this.webhookUnmutedMessageTextBox.Size = new System.Drawing.Size(620, 50);
+            this.webhookUnmutedMessageTextBox.TabIndex = 12;
+            this.webhookUnmutedMessageTextBox.Text = "{\"message\": \"麦克风已开启\"}";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(699, 690);
+            this.ClientSize = new System.Drawing.Size(699, 1090);
+            this.Controls.Add(this.webhookGroupBox);
             this.Controls.Add(this.overlayTopCenterButton);
             this.Controls.Add(this.overlayBottomCenterButton);
             this.Controls.Add(this.overlayHideButton);
@@ -416,6 +582,8 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.iconContextMenu.ResumeLayout(false);
+            this.webhookGroupBox.ResumeLayout(false);
+            this.webhookGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -453,6 +621,20 @@
         private System.Windows.Forms.Button overlayHideButton;
         private System.Windows.Forms.Button overlayBottomCenterButton;
         private System.Windows.Forms.Button overlayTopCenterButton;
+        private System.Windows.Forms.GroupBox webhookGroupBox;
+        private System.Windows.Forms.CheckBox webhookEnabledCheckBox;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TextBox webhookHostTextBox;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox webhookPortTextBox;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox webhookPathTextBox;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TextBox webhookTokenTextBox;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox webhookMutedMessageTextBox;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.TextBox webhookUnmutedMessageTextBox;
     }
 }
 

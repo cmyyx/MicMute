@@ -6,7 +6,10 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Media;
+using System.Net.Http;
 using System.Reactive;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
@@ -35,6 +38,15 @@ namespace MicMute
         private readonly string registryDeviceName = "DeviceName";
         private readonly string registryOverlayX = "OverlayX";
         private readonly string registryOverlayY = "OverlayY";
+        
+        // Webhook 设置
+        private readonly string registryWebhookEnabled = "WebhookEnabled";
+        private readonly string registryWebhookHost = "WebhookHost";
+        private readonly string registryWebhookPort = "WebhookPort";
+        private readonly string registryWebhookPath = "WebhookPath";
+        private readonly string registryWebhookToken = "WebhookToken";
+        private readonly string registryWebhookMutedMessage = "WebhookMutedMessage";
+        private readonly string registryWebhookUnmutedMessage = "WebhookUnmutedMessage";
 
         private string selectedDeviceId;
         private string selectedDeviceName;
@@ -181,16 +193,64 @@ namespace MicMute
                     UpdateIcon(iconOn, device.FullName);
                     if (playSound) PlaySound("on.wav");
                     if (playSound) muteOverlayForm.ShowUnmuted();
+                    if (playSound) SendWebhook(false); // 非静音
                     break;
                 case MicStatus.Off:
                     UpdateIcon(iconOff, device.FullName);
                     if (playSound) PlaySound("off.wav");
                     if (playSound) muteOverlayForm.ShowMuted();
+                    if (playSound) SendWebhook(true); // 静音
                     break;
                 case MicStatus.Error:
                     UpdateIcon(iconError, "< No device >");
                     if (playSound) PlaySound("error.wav");
                     break;
+            }
+        }
+        
+        private async void SendWebhook(bool isMuted)
+        {
+            try
+            {
+                // 检查是否启用 Webhook
+                var enabled = registryKey.GetValue(registryWebhookEnabled);
+                if (enabled == null || enabled.ToString() != "1")
+                {
+                    return;
+                }
+                
+                // 读取 Webhook 配置
+                var host = registryKey.GetValue(registryWebhookHost)?.ToString() ?? "localhost";
+                var port = registryKey.GetValue(registryWebhookPort)?.ToString() ?? "8765";
+                var path = registryKey.GetValue(registryWebhookPath)?.ToString() ?? "/webhook";
+                var token = registryKey.GetValue(registryWebhookToken)?.ToString() ?? "";
+                var message = isMuted 
+                    ? (registryKey.GetValue(registryWebhookMutedMessage)?.ToString() ?? "{\"message\": \"麦克风已静音\"}")
+                    : (registryKey.GetValue(registryWebhookUnmutedMessage)?.ToString() ?? "{\"message\": \"麦克风已开启\"}");
+                
+                // 构建 URL
+                string url = $"http://{host}:{port}{path}";
+                
+                // 发送 HTTP 请求
+                using (var client = new HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(5);
+                    
+                    var request = new HttpRequestMessage(HttpMethod.Post, url);
+                    request.Content = new StringContent(message, Encoding.UTF8, "application/json");
+                    
+                    // 添加 Authorization header
+                    if (!string.IsNullOrWhiteSpace(token))
+                    {
+                        request.Headers.Add("Authorization", $"Bearer {token}");
+                    }
+                    
+                    await client.SendAsync(request);
+                }
+            }
+            catch
+            {
+                // 忽略 Webhook 错误，不影响主功能
             }
         }
         private void UpdateIcon(Icon icon, string tooltipText)
@@ -274,6 +334,31 @@ namespace MicMute
             overlayBgColorTextBox.Text = muteOverlayForm.GetBackgroundColor();
             overlayMutedColorTextBox.Text = muteOverlayForm.GetMutedTextColor();
             overlayUnmutedColorTextBox.Text = muteOverlayForm.GetUnmutedTextColor();
+            
+            // 加载 Webhook 设置
+            LoadWebhookSettings();
+        }
+        
+        private void LoadWebhookSettings()
+        {
+            webhookEnabledCheckBox.Checked = registryKey.GetValue(registryWebhookEnabled)?.ToString() == "1";
+            webhookHostTextBox.Text = registryKey.GetValue(registryWebhookHost)?.ToString() ?? "localhost";
+            webhookPortTextBox.Text = registryKey.GetValue(registryWebhookPort)?.ToString() ?? "8765";
+            webhookPathTextBox.Text = registryKey.GetValue(registryWebhookPath)?.ToString() ?? "/webhook";
+            webhookTokenTextBox.Text = registryKey.GetValue(registryWebhookToken)?.ToString() ?? "";
+            webhookMutedMessageTextBox.Text = registryKey.GetValue(registryWebhookMutedMessage)?.ToString() ?? "{\"message\": \"麦克风已静音\"}";
+            webhookUnmutedMessageTextBox.Text = registryKey.GetValue(registryWebhookUnmutedMessage)?.ToString() ?? "{\"message\": \"麦克风已开启\"}";
+        }
+        
+        private void SaveWebhookSettings()
+        {
+            registryKey.SetValue(registryWebhookEnabled, webhookEnabledCheckBox.Checked ? "1" : "0");
+            registryKey.SetValue(registryWebhookHost, webhookHostTextBox.Text);
+            registryKey.SetValue(registryWebhookPort, webhookPortTextBox.Text);
+            registryKey.SetValue(registryWebhookPath, webhookPathTextBox.Text);
+            registryKey.SetValue(registryWebhookToken, webhookTokenTextBox.Text);
+            registryKey.SetValue(registryWebhookMutedMessage, webhookMutedMessageTextBox.Text);
+            registryKey.SetValue(registryWebhookUnmutedMessage, webhookUnmutedMessageTextBox.Text);
         }
 
         private void OverlayPreviewButton_Click(object sender, EventArgs e)
@@ -415,6 +500,9 @@ namespace MicMute
                         if (!hotkeyBinder.IsHotkeyAlreadyBound(unMuteHotkey)) hotkeyBinder.Bind(unMuteHotkey).To(UnMuteMicStatus);
                     }
                 }
+                
+                // 保存 Webhook 设置
+                SaveWebhookSettings();
 
             }
         }
