@@ -14,6 +14,7 @@ namespace MicMute
         private readonly string registryOverlayMutedTextColor = "OverlayMutedTextColor";
         private readonly string registryOverlayUnmutedTextColor = "OverlayUnmutedTextColor";
         private Timer previewTimer;
+        private Timer topMostTimer;
         private Label statusLabel;
         private PictureBox iconBox;
         
@@ -73,6 +74,11 @@ namespace MicMute
             previewTimer = new Timer();
             previewTimer.Interval = 5000; // 5秒
             previewTimer.Tick += PreviewTimer_Tick;
+
+            // TopMost 保持计时器
+            topMostTimer = new Timer();
+            topMostTimer.Interval = 1000; // 每秒检查一次
+            topMostTimer.Tick += TopMostTimer_Tick;
         }
         
         private void LoadColors()
@@ -148,6 +154,15 @@ namespace MicMute
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
+        // Windows API 用于强制置顶
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+        private const uint SWP_NOMOVE = 0x0002;
+        private const uint SWP_NOSIZE = 0x0001;
+        private const uint SWP_SHOWWINDOW = 0x0040;
+
         public void LoadPosition()
         {
             try
@@ -183,7 +198,7 @@ namespace MicMute
             previewTimer.Stop();
             statusLabel.Text = "麦克风已静音";
             statusLabel.ForeColor = mutedTextColor;
-            
+
             // 使用托盘图标（橘红色）
             try
             {
@@ -197,13 +212,19 @@ namespace MicMute
             if (!this.Visible)
             {
                 this.Show();
+                // 立即强制置顶
+                ForceTopMost();
             }
+
+            // 启动置顶检查计时器
+            topMostTimer.Start();
         }
 
         public void ShowUnmuted()
         {
             // 非静音时直接隐藏悬浮窗，不显示任何内容
             previewTimer.Stop();
+            topMostTimer.Stop(); // 停止置顶检查计时器
             this.Hide();
         }
 
@@ -211,7 +232,7 @@ namespace MicMute
         {
             statusLabel.Text = "悬浮窗预览";
             statusLabel.ForeColor = Color.FromArgb(100, 150, 200);
-            
+
             try
             {
                 iconBox.Image = Properties.Resources.on.ToBitmap();
@@ -222,20 +243,56 @@ namespace MicMute
             }
 
             this.Show();
+            // 立即强制置顶
+            ForceTopMost();
+
             previewTimer.Stop();
             previewTimer.Start();
+
+            // 预览时也启动置顶检查计时器
+            topMostTimer.Start();
         }
         
         public void HideOverlay()
         {
             previewTimer.Stop();
+            topMostTimer.Stop(); // 停止置顶检查计时器
             this.Hide();
         }
         
         private void PreviewTimer_Tick(object sender, EventArgs e)
         {
             previewTimer.Stop();
+            topMostTimer.Stop(); // 停止置顶检查计时器
             this.Hide();
+        }
+
+        private void TopMostTimer_Tick(object sender, EventArgs e)
+        {
+            // 只有在窗口可见时才强制置顶
+            if (this.Visible && !this.IsDisposed)
+            {
+                ForceTopMost();
+            }
+        }
+
+        private void ForceTopMost()
+        {
+            try
+            {
+                // 使用 SetWindowPos 强制置顶
+                SetWindowPos(this.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+
+                // 确保 TopMost 属性也是 true
+                if (!this.TopMost)
+                {
+                    this.TopMost = true;
+                }
+            }
+            catch
+            {
+                // 忽略错误，继续运行
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -243,6 +300,8 @@ namespace MicMute
             if (e.CloseReason == CloseReason.UserClosing)
             {
                 e.Cancel = true;
+                previewTimer.Stop();
+                topMostTimer.Stop(); // 停止置顶检查计时器
                 this.Hide();
             }
             base.OnFormClosing(e);
